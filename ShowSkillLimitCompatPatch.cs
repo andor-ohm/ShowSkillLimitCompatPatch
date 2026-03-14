@@ -1,8 +1,8 @@
 using HarmonyLib;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.ScreenSystem;
 
@@ -12,11 +12,27 @@ namespace ShowSkillLimitCompatPatch
     {
         private const string HarmonyId = "ShowSkillLimitCompatPatch";
         private const string ExpectedScreenTypeName = "SandBox.GauntletUI.GauntletCharacterDeveloperScreen";
+        private const string DebugMessagePrefix = "[ShowSkillLimitCompatPatch] ";
 
-        private static readonly HashSet<string> LoggedContexts = new HashSet<string>(StringComparer.Ordinal);
         private static Harmony _harmony;
         private static bool _showSkillLimitPatched;
-        private static string _logPath;
+        private static int _lastUnsupportedScreenIdentity;
+
+        private static bool EnableDebugMessages
+        {
+            get
+            {
+                try
+                {
+                    return ShowSkillLimitCompatPatchSettings.Instance != null &&
+                           ShowSkillLimitCompatPatchSettings.Instance.EnableDebugMessages;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
 
         protected override void OnSubModuleLoad()
         {
@@ -24,17 +40,14 @@ namespace ShowSkillLimitCompatPatch
 
             try
             {
-                EnsureLogReady();
-                Log("ShowSkillLimitCompatPatch loading.");
-
                 _harmony = new Harmony(HarmonyId);
                 AppDomain.CurrentDomain.AssemblyLoad += CurrentDomain_AssemblyLoad;
-
+                DebugMessage("Loading.");
                 TryPatchShowSkillLimit();
             }
             catch (Exception ex)
             {
-                Log("OnSubModuleLoad failed: " + ex);
+                DebugMessage("OnSubModuleLoad failed: " + ex.Message);
             }
         }
 
@@ -49,11 +62,11 @@ namespace ShowSkillLimitCompatPatch
                     _harmony.UnpatchAll(HarmonyId);
                 }
 
-                Log("ShowSkillLimitCompatPatch unloaded.");
+                DebugMessage("Unloaded.");
             }
             catch (Exception ex)
             {
-                Log("OnSubModuleUnloaded failed: " + ex);
+                DebugMessage("OnSubModuleUnloaded failed: " + ex.Message);
             }
 
             base.OnSubModuleUnloaded();
@@ -70,13 +83,13 @@ namespace ShowSkillLimitCompatPatch
 
                 if (string.Equals(args.LoadedAssembly.GetName().Name, "ShowSkillLimit", StringComparison.Ordinal))
                 {
-                    Log("ShowSkillLimit assembly loaded after CharacterReloadPatch. Retrying patch.");
+                    DebugMessage("Show Skill Limit loaded after this patch. Retrying compatibility hook.");
                     TryPatchShowSkillLimit();
                 }
             }
             catch (Exception ex)
             {
-                Log("AssemblyLoad handler failed: " + ex);
+                DebugMessage("AssemblyLoad handler failed: " + ex.Message);
             }
         }
 
@@ -92,14 +105,14 @@ namespace ShowSkillLimitCompatPatch
                 Type targetType = AccessTools.TypeByName("ShowSkillLimit.PerkSelectionBarWidgetPatch");
                 if (targetType == null)
                 {
-                    Log("ShowSkillLimit.PerkSelectionBarWidgetPatch not found yet.");
+                    DebugMessage("ShowSkillLimit.PerkSelectionBarWidgetPatch not found yet.");
                     return;
                 }
 
                 MethodInfo targetMethod = AccessTools.Method(targetType, "OnLateUpdatePostfix");
                 if (targetMethod == null)
                 {
-                    Log("ShowSkillLimit.PerkSelectionBarWidgetPatch.OnLateUpdatePostfix not found.");
+                    DebugMessage("ShowSkillLimit.PerkSelectionBarWidgetPatch.OnLateUpdatePostfix not found.");
                     return;
                 }
 
@@ -107,11 +120,11 @@ namespace ShowSkillLimitCompatPatch
                 _harmony.Patch(targetMethod, prefix: new HarmonyMethod(prefixMethod));
                 _showSkillLimitPatched = true;
 
-                Log("Patched ShowSkillLimit.PerkSelectionBarWidgetPatch.OnLateUpdatePostfix.");
+                DebugMessage("Patched ShowSkillLimit.PerkSelectionBarWidgetPatch.OnLateUpdatePostfix.");
             }
             catch (Exception ex)
             {
-                Log("Failed to patch ShowSkillLimit compatibility guard: " + ex);
+                DebugMessage("Failed to patch compatibility guard: " + ex.Message);
             }
         }
 
@@ -122,15 +135,22 @@ namespace ShowSkillLimitCompatPatch
                 ScreenBase topScreen = ScreenManager.TopScreen;
                 if (IsVanillaCharacterDeveloperScreen(topScreen))
                 {
+                    _lastUnsupportedScreenIdentity = 0;
                     return true;
                 }
 
-                LogSuppressedContext(topScreen);
+                if (topScreen == null)
+                {
+                    _lastUnsupportedScreenIdentity = 0;
+                    return false;
+                }
+
+                ReportSuppressedContext(topScreen);
                 return false;
             }
             catch (Exception ex)
             {
-                Log("Compatibility prefix failed unexpectedly, allowing original method: " + ex);
+                DebugMessage("Compatibility prefix failed unexpectedly; allowing original method: " + ex.Message);
                 return true;
             }
         }
@@ -151,55 +171,33 @@ namespace ShowSkillLimitCompatPatch
             return string.Equals(topScreen.GetType().FullName, ExpectedScreenTypeName, StringComparison.Ordinal);
         }
 
-        private static void LogSuppressedContext(ScreenBase topScreen)
+        private static void ReportSuppressedContext(ScreenBase topScreen)
         {
-            string screenTypeName = topScreen != null ? topScreen.GetType().FullName : "<null>";
-            string contextKey = "suppressed:" + screenTypeName;
-
-            if (!LoggedContexts.Add(contextKey))
+            if (topScreen == null)
             {
                 return;
             }
 
-            Log(
-                "Suppressed ShowSkillLimit.OnLateUpdatePostfix because TopScreen was '" +
-                screenTypeName +
-                "' instead of '" +
-                ExpectedScreenTypeName +
-                "'. This is the compatibility fix for Character Reload style custom screens."
-            );
-        }
-
-        private static void EnsureLogReady()
-        {
-            if (!string.IsNullOrEmpty(_logPath))
+            int currentScreenIdentity = RuntimeHelpers.GetHashCode(topScreen);
+            if (_lastUnsupportedScreenIdentity == currentScreenIdentity)
             {
                 return;
             }
 
-            string dllDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string moduleDirectory = Directory.GetParent(Directory.GetParent(dllDirectory).FullName).FullName;
-            string logDirectory = Path.Combine(moduleDirectory, "Logs");
-
-            Directory.CreateDirectory(logDirectory);
-
-            _logPath = Path.Combine(logDirectory, "ShowSkillLimitCompatPatch.log");
-            File.AppendAllText(
-                _logPath,
-                Environment.NewLine +
-                "========== ShowSkillLimitCompatPatch startup " +
-                DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") +
-                " ==========" +
-                Environment.NewLine
-            );
+            _lastUnsupportedScreenIdentity = currentScreenIdentity;
+            DebugMessage("Triggered");
         }
 
-        internal static void Log(string message)
+        internal static void DebugMessage(string message)
         {
+            if (!EnableDebugMessages)
+            {
+                return;
+            }
+
             try
             {
-                EnsureLogReady();
-                File.AppendAllText(_logPath, "[" + DateTime.Now.ToString("HH:mm:ss.fff") + "] " + message + Environment.NewLine);
+                InformationManager.DisplayMessage(new InformationMessage(DebugMessagePrefix + message));
             }
             catch
             {

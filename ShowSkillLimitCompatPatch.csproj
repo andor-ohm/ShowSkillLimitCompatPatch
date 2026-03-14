@@ -12,6 +12,13 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <SkipBannerlordDeploy Condition="'$(SkipBannerlordDeploy)' == ''">false</SkipBannerlordDeploy>
+    <BannerlordModulesDir Condition="'$(BannerlordModulesDir)' == '' and '$(BANNERLORD_MODULES_DIR)' != ''">$(BANNERLORD_MODULES_DIR)</BannerlordModulesDir>
+    <BannerlordModulesDir Condition="'$(BannerlordModulesDir)' == '' and Exists('D:\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules')">D:\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules</BannerlordModulesDir>
+    <BannerlordModulesDir Condition="'$(BannerlordModulesDir)' == '' and Exists('C:\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules')">C:\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules</BannerlordModulesDir>
+    <BannerlordModulesDir Condition="'$(BannerlordModulesDir)' == '' and Exists('C:\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules')">C:\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules</BannerlordModulesDir>
+    <BannerlordModulesDir Condition="'$(BannerlordModulesDir)' == '' and Exists('C:\Program Files\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules')">C:\Program Files\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules</BannerlordModulesDir>
+    <BannerlordModuleOutputDir Condition="'$(BannerlordModulesDir)' != ''">$(BannerlordModulesDir)\ShowSkillLimitCompatPatch</BannerlordModuleOutputDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,6 +44,9 @@
       <HintPath>..\..\..\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client\0Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="MCMv5">
+      <HintPath>..\..\..\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\Bannerlord.MBOptionScreen\bin\Win64_Shipping_Client\MCMv5.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="TaleWorlds.Core">
@@ -58,21 +68,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ShowSkillLimitCompatPatch.cs" />
+    <Compile Include="ShowSkillLimitCompatPatchSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="SubModule.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="LICENSE" />
+    <None Include="README.md" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>set "MODDIR=D:\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\ShowSkillLimitCompatPatch"
-
-if not exist "%25MODDIR%25" mkdir "%25MODDIR%25"
-if not exist "%25MODDIR%25\Logs" mkdir "%25MODDIR%25\Logs"
-if not exist "%25MODDIR%25\bin" mkdir "%25MODDIR%25\bin"
-if not exist "%25MODDIR%25\bin\Win64_Shipping_Client" mkdir "%25MODDIR%25\bin\Win64_Shipping_Client"
-
-copy /Y "$(ProjectDir)\SubModule.xml" "%25MODDIR%25\SubModule.xml"
-copy /Y "$(TargetPath)" "%25MODDIR%25\bin\Win64_Shipping_Client\ShowSkillLimitCompatPatch.dll"</PostBuildEvent>
-  </PropertyGroup>
+  <Target Name="DeployToBannerlordModules" AfterTargets="Build" Condition="'$(SkipBannerlordDeploy)' != 'true'">
+    <Error Condition="'$(BannerlordModulesDir)' == ''" Text="Could not find the Bannerlord Modules directory. Set the BANNERLORD_MODULES_DIR environment variable, pass /p:BannerlordModulesDir=...\Modules, or build with /p:SkipBannerlordDeploy=true." />
+    <MakeDir Directories="$(BannerlordModuleOutputDir)" />
+    <MakeDir Directories="$(BannerlordModuleOutputDir)\bin\Win64_Shipping_Client" />
+    <Copy SourceFiles="$(ProjectDir)SubModule.xml" DestinationFiles="$(BannerlordModuleOutputDir)\SubModule.xml" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(BannerlordModuleOutputDir)\bin\Win64_Shipping_Client\ShowSkillLimitCompatPatch.dll" />
+  </Target>
 </Project>

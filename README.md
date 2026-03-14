@@ -28,6 +28,7 @@ the Show Skill Limit postfix is skipped for that frame. This keeps `Show Skill L
 
 - Mount & Blade II: Bannerlord
 - `Bannerlord.Harmony`
+- `Bannerlord.MBOptionScreen`
 - `CharacterReload`
 - `ShowSkillLimit`
 
@@ -54,13 +55,11 @@ Load this patch after both `ShowSkillLimit` and `CharacterReload`.
 
 The module also declares both as dependencies in `SubModule.xml`
 
-## Logging
+## Debug Messages
 
-The mod writes a lightweight diagnostic log here:
+The mod includes an MCM setting named `Enable Debug Messages`.
 
-`Modules/ShowSkillLimitCompatPatch/Logs/ShowSkillLimitCompatPatch.log`
-
-It records when the compatibility patch is applied and when a non-vanilla screen causes the Show Skill Limit postfix to be suppressed.
+When enabled, the patch prints lightweight compatibility messages to Bannerlord's in-game message feed. It is off by default.
 
 ## Building
 
@@ -70,7 +69,15 @@ Open:
 
 `ShowSkillLimitCompatPatch.csproj`
 
-in Visual Studio 2022, build it, and the post-build step will copy the DLL and `SubModule.xml` into your Bannerlord `Modules/ShowSkillLimitCompatPatch` folder.
+By default the project tries to deploy directly into your Bannerlord `Modules` folder after a successful build.
+
+If Bannerlord is not installed in one of the common Steam locations, set the `BANNERLORD_MODULES_DIR` environment variable to your Bannerlord `Modules` folder or build with:
+
+`/p:BannerlordModulesDir=YourPathHere\Modules`
+
+If you want to build without deploying, use:
+
+`/p:SkipBannerlordDeploy=true`
 
 ## Credits
 

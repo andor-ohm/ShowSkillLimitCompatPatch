@@ -2,7 +2,7 @@
 <Module>
   <Name value="Show Skill Limit Compat Patch" />
   <Id value="ShowSkillLimitCompatPatch" />
-  <Version value="v1.0.0" />
+  <Version value="v1.0.1" />
   <SingleplayerModule value="true" />
   <MultiplayerModule value="false" />
   <Official value="false" />
@@ -13,6 +13,7 @@
     <DependedModule Id="Sandbox" />
     <DependedModule Id="StoryMode" />
     <DependedModule Id="Bannerlord.Harmony" />
+    <DependedModule Id="Bannerlord.MBOptionScreen" />
     <DependedModule Id="ShowSkillLimit" />
     <DependedModule Id="CharacterReload" />
   </DependedModules>
