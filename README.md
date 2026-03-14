@@ -52,7 +52,7 @@ Mount & Blade II Bannerlord
 
 Load this patch after both `ShowSkillLimit` and `CharacterReload`.
 
-The module also declares both as dependencies in `SubModule.xml`, which helps keep the order stable.
+The module also declares both as dependencies in `SubModule.xml`
 
 ## Logging
 
@@ -71,16 +71,6 @@ Open:
 `ShowSkillLimitCompatPatch.csproj`
 
 in Visual Studio 2022, build it, and the post-build step will copy the DLL and `SubModule.xml` into your Bannerlord `Modules/ShowSkillLimitCompatPatch` folder.
-
-## Repository Notes
-
-This repository ignores local Visual Studio and build output folders such as:
-
-- `.vs`
-- `bin`
-- `obj`
-
-Those files are generated locally and should not be committed.
 
 ## Credits
 
