@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Module>
+  <Name value="Show Skill Limit Compat Patch" />
+  <Id value="ShowSkillLimitCompatPatch" />
+  <Version value="v1.0.0" />
+  <SingleplayerModule value="true" />
+  <MultiplayerModule value="false" />
+  <Official value="false" />
+
+  <DependedModules>
+    <DependedModule Id="Native" />
+    <DependedModule Id="SandBoxCore" />
+    <DependedModule Id="Sandbox" />
+    <DependedModule Id="StoryMode" />
+    <DependedModule Id="Bannerlord.Harmony" />
+    <DependedModule Id="ShowSkillLimit" />
+    <DependedModule Id="CharacterReload" />
+  </DependedModules>
+
+  <SubModules>
+    <SubModule>
+      <Name value="ShowSkillLimitCompatPatch" />
+      <DLLName value="ShowSkillLimitCompatPatch.dll" />
+      <SubModuleClassType value="ShowSkillLimitCompatPatch.SubModule" />
+      <Tags>
+        <Tag key="DedicatedServerType" value="none" />
+      </Tags>
+    </SubModule>
+  </SubModules>
+
+  <Xmls />
+</Module>
