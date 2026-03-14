@@ -82,8 +82,8 @@ If you want to build without deploying, use:
 ## Credits
 
 - TaleWorlds for Bannerlord
-- The authors of `Character Reload`
-- The authors of `Show Skill Limit`
+- The authors of `Character Reload` https://www.nexusmods.com/mountandblade2bannerlord/mods/3700
+- The authors of `Show Skill Limit` https://www.nexusmods.com/mountandblade2bannerlord/mods/9209
 
 ## License
 
