@@ -18,6 +18,7 @@
     <BannerlordModulesDir Condition="'$(BannerlordModulesDir)' == '' and Exists('C:\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules')">C:\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules</BannerlordModulesDir>
     <BannerlordModulesDir Condition="'$(BannerlordModulesDir)' == '' and Exists('C:\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules')">C:\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules</BannerlordModulesDir>
     <BannerlordModulesDir Condition="'$(BannerlordModulesDir)' == '' and Exists('C:\Program Files\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules')">C:\Program Files\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules</BannerlordModulesDir>
+    <BannerlordBaseDir Condition="'$(BannerlordModulesDir)' != ''">$(BannerlordModulesDir)\..</BannerlordBaseDir>
     <BannerlordModuleOutputDir Condition="'$(BannerlordModulesDir)' != ''">$(BannerlordModulesDir)\ShowSkillLimitCompatPatch</BannerlordModuleOutputDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -41,28 +42,28 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
-      <HintPath>..\..\..\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client\0Harmony.dll</HintPath>
+      <HintPath>$(BannerlordModulesDir)\Bannerlord.Harmony\bin\Win64_Shipping_Client\0Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MCMv5">
-      <HintPath>..\..\..\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\Bannerlord.MBOptionScreen\bin\Win64_Shipping_Client\MCMv5.dll</HintPath>
+      <HintPath>$(BannerlordModulesDir)\Bannerlord.MBOptionScreen\bin\Win64_Shipping_Client\MCMv5.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="TaleWorlds.Core">
-      <HintPath>..\..\..\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\bin\Win64_Shipping_Client\TaleWorlds.Core.dll</HintPath>
+      <HintPath>$(BannerlordBaseDir)\bin\Win64_Shipping_Client\TaleWorlds.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="TaleWorlds.Library">
-      <HintPath>..\..\..\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\bin\Win64_Shipping_Client\TaleWorlds.Library.dll</HintPath>
+      <HintPath>$(BannerlordBaseDir)\bin\Win64_Shipping_Client\TaleWorlds.Library.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="TaleWorlds.MountAndBlade">
-      <HintPath>..\..\..\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.dll</HintPath>
+      <HintPath>$(BannerlordBaseDir)\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="TaleWorlds.ScreenSystem">
-      <HintPath>..\..\..\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\bin\Win64_Shipping_Client\TaleWorlds.ScreenSystem.dll</HintPath>
+      <HintPath>$(BannerlordBaseDir)\bin\Win64_Shipping_Client\TaleWorlds.ScreenSystem.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -84,7 +85,7 @@
     <Error Condition="'$(BannerlordModulesDir)' == ''" Text="Could not find the Bannerlord Modules directory. Set the BANNERLORD_MODULES_DIR environment variable, pass /p:BannerlordModulesDir=...\Modules, or build with /p:SkipBannerlordDeploy=true." />
     <MakeDir Directories="$(BannerlordModuleOutputDir)" />
     <MakeDir Directories="$(BannerlordModuleOutputDir)\bin\Win64_Shipping_Client" />
-    <Copy SourceFiles="$(ProjectDir)SubModule.xml" DestinationFiles="$(BannerlordModuleOutputDir)\SubModule.xml" />
-    <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(BannerlordModuleOutputDir)\bin\Win64_Shipping_Client\ShowSkillLimitCompatPatch.dll" />
+    <Copy SourceFiles="$(ProjectDir)SubModule.xml" DestinationFiles="$(BannerlordModuleOutputDir)\SubModule.xml" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(BannerlordModuleOutputDir)\bin\Win64_Shipping_Client\ShowSkillLimitCompatPatch.dll" SkipUnchangedFiles="true" />
   </Target>
 </Project>
