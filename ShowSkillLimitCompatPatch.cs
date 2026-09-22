@@ -11,6 +11,7 @@ namespace ShowSkillLimitCompatPatch
     public class SubModule : MBSubModuleBase
     {
         private const string HarmonyId = "ShowSkillLimitCompatPatch";
+        private const string ShowSkillLimitPatchTypeName = "ShowSkillLimit.SkillLimitPatch";
         private const string ExpectedScreenTypeName = "SandBox.GauntletUI.GauntletCharacterDeveloperScreen";
         private const string DebugMessagePrefix = "[ShowSkillLimitCompatPatch] ";
 
@@ -102,17 +103,17 @@ namespace ShowSkillLimitCompatPatch
 
             try
             {
-                Type targetType = AccessTools.TypeByName("ShowSkillLimit.PerkSelectionBarWidgetPatch");
+                Type targetType = AccessTools.TypeByName(ShowSkillLimitPatchTypeName);
                 if (targetType == null)
                 {
-                    DebugMessage("ShowSkillLimit.PerkSelectionBarWidgetPatch not found yet.");
+                    DebugMessage(ShowSkillLimitPatchTypeName + " not found yet.");
                     return;
                 }
 
                 MethodInfo targetMethod = AccessTools.Method(targetType, "OnLateUpdatePostfix");
                 if (targetMethod == null)
                 {
-                    DebugMessage("ShowSkillLimit.PerkSelectionBarWidgetPatch.OnLateUpdatePostfix not found.");
+                    DebugMessage(ShowSkillLimitPatchTypeName + ".OnLateUpdatePostfix not found.");
                     return;
                 }
 
@@ -120,7 +121,7 @@ namespace ShowSkillLimitCompatPatch
                 _harmony.Patch(targetMethod, prefix: new HarmonyMethod(prefixMethod));
                 _showSkillLimitPatched = true;
 
-                DebugMessage("Patched ShowSkillLimit.PerkSelectionBarWidgetPatch.OnLateUpdatePostfix.");
+                DebugMessage("Patched " + ShowSkillLimitPatchTypeName + ".OnLateUpdatePostfix.");
             }
             catch (Exception ex)
             {

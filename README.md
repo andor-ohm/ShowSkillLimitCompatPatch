@@ -14,9 +14,9 @@ This patch prevents `Show Skill Limit` from running its `PerkSelectionBarWidget.
 
 ## How It Works
 
-This mod applies a Harmony prefix to:
+Version 1.0.2 applies a Harmony prefix to:
 
-`ShowSkillLimit.PerkSelectionBarWidgetPatch.OnLateUpdatePostfix`
+`ShowSkillLimit.SkillLimitPatch.OnLateUpdatePostfix`
 
 If the active `TopScreen` is not:
 
@@ -31,6 +31,8 @@ the Show Skill Limit postfix is skipped for that frame. This keeps `Show Skill L
 - `Bannerlord.MBOptionScreen`
 - `CharacterReload`
 - `ShowSkillLimit`
+
+Version 1.0.2 was tested with Bannerlord 1.4.8, Show Skill Limit 1.0.4, and Character Reload e1.4.5.0. It supports the current Show Skill Limit generation only; use compatibility-patch version 1.0.1 with older Show Skill Limit releases.
 
 ## Installation
 
@@ -53,7 +55,7 @@ Mount & Blade II Bannerlord
 
 Load this patch after both `ShowSkillLimit` and `CharacterReload`.
 
-The module also declares both as dependencies in `SubModule.xml`
+The module also declares both as dependencies in `SubModule.xml`.
 
 ## Debug Messages
 
@@ -61,23 +63,20 @@ The mod includes an MCM setting named `Enable Debug Messages`.
 
 When enabled, the patch prints lightweight compatibility messages to Bannerlord's in-game message feed. It is off by default.
 
-## Building
+## Development
 
-This project targets `.NET Framework 4.7.2` and references local Bannerlord assemblies from a Steam install.
+This repository contains the Visual Studio project used to build the mod:
 
-Open:
+- `ShowSkillLimitCompatPatch.sln`
+- `ShowSkillLimitCompatPatch.csproj`
 
-`ShowSkillLimitCompatPatch.csproj`
+The project targets `.NET Framework 4.7.2` and references local Bannerlord, Harmony, and MCM assemblies. Set `BannerlordGameRoot` or the `BANNERLORD_GAME_ROOT` environment variable to your Bannerlord installation before building.
 
-By default the project tries to deploy directly into your Bannerlord `Modules` folder after a successful build.
+Building does not deploy files into the game installation.
 
-If Bannerlord is not installed in one of the common Steam locations, set the `BANNERLORD_MODULES_DIR` environment variable to your Bannerlord `Modules` folder or build with:
+## Changelog
 
-`/p:BannerlordModulesDir=YourPathHere\Modules`
-
-If you want to build without deploying, use:
-
-`/p:SkipBannerlordDeploy=true`
+See [CHANGELOG.md](./CHANGELOG.md) for release history.
 
 ## Credits
 

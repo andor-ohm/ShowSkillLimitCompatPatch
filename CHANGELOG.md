@@ -1,5 +1,13 @@
 # Changelog
 
+## Version 1.0.2
+
+- Updated the compatibility hook for Show Skill Limit 1.0.4 and its current `ShowSkillLimit.SkillLimitPatch` implementation
+- Fixed the recurring `ShowSkillLimit: error` message spam in Character Reload's custom character screen
+- Verified both mods and the compatibility patch load together without related errors or exceptions
+- Left module dependencies unversioned so compatible Bannerlord and dependency updates are not blocked by the launcher
+- This release targets the current Show Skill Limit generation only; use an earlier compatibility-patch release with older Show Skill Limit versions
+
 ## Version 1.0.1
 
 - Added configurable build/deploy support for non-default Bannerlord install paths
